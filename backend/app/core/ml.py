@@ -1,6 +1,5 @@
-from sentence_transformers import SentenceTransformer
+from sklearn.feature_extraction.text import TfidfVectorizer
 import numpy as np
-
 class MLModels:
     def __init__(self):
         print("Loading Sentence Transformer model...")
