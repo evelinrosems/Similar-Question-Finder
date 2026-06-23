@@ -10,31 +10,54 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const checkAuth = async () => {
       const token = localStorage.getItem('token');
+
       if (token) {
         try {
           const response = await api.get('/auth/me');
           setUser(response.data);
         } catch (error) {
-          console.error("Authentication failed", error);
+          console.error('Authentication failed', error);
           localStorage.removeItem('token');
+          setUser(null);
         }
       }
+
       setLoading(false);
     };
+
     checkAuth();
   }, []);
 
   const login = async (email, password) => {
-    const response = await api.post('/auth/login', { email, password });
+    const formData = new URLSearchParams();
+    formData.append('username', email);
+    formData.append('password', password);
+
+    const response = await api.post(
+      '/auth/login',
+      formData,
+      {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+      }
+    );
+
     localStorage.setItem('token', response.data.access_token);
-    // Fetch user details
+
     const userRes = await api.get('/auth/me');
     setUser(userRes.data);
+
+    return response.data;
   };
 
   const register = async (username, email, password) => {
-    await api.post('/auth/register', { username, email, password });
-    // Auto login after register
+    await api.post('/auth/register', {
+      username,
+      email,
+      password,
+    });
+
     await login(email, password);
   };
 
@@ -44,7 +67,15 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, loading }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        login,
+        register,
+        logout,
+        loading,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
