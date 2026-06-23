@@ -6,7 +6,6 @@ python-jose[cryptography]
 passlib[bcrypt]
 bcrypt==3.2.2
 python-multipart
-sentence-transformers
 sqlalchemy
 aiosqlite
 email-validator
