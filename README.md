@@ -8,9 +8,9 @@
 
 ## Project Overview
 
-Similar Question Finder is a web application that allows users to register, log in, submit study questions, automatically categorize them into academic topics, and find semantically similar questions using AI/ML techniques.
+Similar Question Finder is a web application that allows users to register, log in, submit study questions, automatically categorize them into academic topics, and find similar questions using AI/ML techniques.
 
-The system performs semantic similarity search locally using open-source machine learning models without relying on external paid AI APIs.
+The system performs similarity search locally using open-source machine learning libraries without relying on external paid AI APIs.
 
 ---
 
@@ -18,11 +18,23 @@ The system performs semantic similarity search locally using open-source machine
 
 * User Registration and Login (JWT Authentication)
 * Automatic Topic Classification
-* Semantic Similarity Search
+* Similar Question Search
 * Question History Tracking
 * SQLite Database Storage
 * FastAPI Backend
 * React Frontend
+
+---
+
+## Live Demo
+
+### Frontend
+
+https://similar-question-finder-rosy.vercel.app
+
+### Backend API
+
+https://similar-question-finder.onrender.com
 
 ---
 
@@ -44,8 +56,8 @@ The system performs semantic similarity search locally using open-source machine
 
 ### AI / ML
 
-* Sentence Transformers
-* all-MiniLM-L6-v2
+* Scikit-learn
+* TF-IDF Vectorization
 * Cosine Similarity
 
 ---
@@ -90,25 +102,24 @@ http://localhost:5173
 
 ## AI/ML Implementation
 
-This project uses the Sentence Transformers model **all-MiniLM-L6-v2** to generate embeddings for study questions.
+This project uses Scikit-learn's TF-IDF Vectorizer to convert study questions into vector representations.
 
 ### Question Submission
 
 1. User submits a question.
-2. The question is converted into a vector embedding.
-3. Cosine similarity is used to compare the embedding with predefined topic embeddings.
-4. The most relevant topic is automatically assigned.
-5. Question data is stored in SQLite.
+2. The question is converted into a TF-IDF vector.
+3. A topic is automatically assigned using keyword-based classification.
+4. The question and metadata are stored in the SQLite database.
 
 ### Similar Question Search
 
-1. Search query is converted into an embedding.
-2. Stored question embeddings are retrieved from the database.
+1. The search query is converted into a TF-IDF vector.
+2. Stored question vectors are retrieved.
 3. Cosine similarity is calculated between the query and stored questions.
-4. Results are ranked by similarity score.
-5. Top matching questions are returned to the user.
+4. Results are ranked according to similarity score.
+5. Top matching questions are displayed to the user.
 
-All AI functionality runs locally using open-source libraries.
+All AI/ML processing runs locally within the FastAPI backend using open-source libraries.
 
 No external paid AI APIs such as OpenAI, Gemini, or Claude are used.
 
@@ -136,5 +147,5 @@ Similar-Question-Finder/
 
 ## Author
 
-Evelin Rose M S
+**Evelin Rose M S**
 MCA Student
