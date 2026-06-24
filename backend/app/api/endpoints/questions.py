@@ -56,28 +56,46 @@ async def search_questions(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
-    # Generate query embedding
-    query_embedding = ml_service.get_embedding(question_in.text)
-    
-    # Fetch all questions for local cosine similarity search
-    result = await db.execute(select(Question))
-    all_questions = result.scalars().all()
-    
-    results = []
-    for q in all_questions:
-        if q.embedding:
-            score = ml_service.compute_cosine_similarity(query_embedding, q.embedding)
-            results.append({
-                "id": q.id,
-                "text": q.text,
-                "topic": q.topic,
-                "score": score
-            })
-            
-    # Sort by score descending and take top 5
-    results.sort(key=lambda x: x["score"], reverse=True)
-    top_results = results[:5]
-    
-    return [
-        QuestionSearchResponse(**r) for r in top_results
-    ]
+    try:
+        # Generate query embedding
+        query_embedding = ml_service.get_embedding(question_in.text)
+
+        # Fetch all questions
+        result = await db.execute(select(Question))
+        all_questions = result.scalars().all()
+
+        results = []
+
+        for q in all_questions:
+            if q.embedding:
+
+                try:
+                    score = ml_service.compute_cosine_similarity(
+                        query_embedding,
+                        q.embedding
+                    )
+                except Exception as e:
+                    print(f"Similarity Error: {e}")
+                    score = 0.0
+
+                results.append({
+                    "id": q.id,
+                    "text": q.text,
+                    "topic": q.topic,
+                    "score": score
+                })
+
+        # Sort by similarity
+        results.sort(key=lambda x: x["score"], reverse=True)
+
+        return [
+            QuestionSearchResponse(**r)
+            for r in results[:5]
+        ]
+
+    except Exception as e:
+        print(f"Search Endpoint Error: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail=str(e)
+        )
