@@ -13,25 +13,27 @@ router = APIRouter()
 
 @router.post("/", response_model=QuestionResponse)
 async def submit_question(
-    question_in: QuestionCreate, 
+    question_in: QuestionCreate,
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
-    # Generate Embedding and Assign Topic
+    # Generate embedding
     embedding = ml_service.get_embedding(question_in.text)
-    topic = ml_service.assign_topic(embedding)
-    
+
+    # Assign topic from text (NOT embedding)
+    topic = ml_service.assign_topic(question_in.text)
+
     new_question = Question(
         user_id=current_user.id,
         text=question_in.text,
         embedding=embedding,
         topic=topic
     )
-    
+
     db.add(new_question)
     await db.commit()
     await db.refresh(new_question)
-    
+
     return new_question
 
 @router.get("/history", response_model=list[QuestionResponse])
