@@ -6,11 +6,34 @@ class MLModels:
     def __init__(self):
         print("Loading ML Models...")
 
+        # Fixed vocabulary for all embeddings
+        self.vectorizer = TfidfVectorizer(
+            vocabulary=[
+                "dna", "cell", "genetics", "biology",
+                "gravity", "force", "motion", "physics",
+                "acid", "base", "atom", "molecule", "chemistry",
+                "equation", "algebra", "calculus", "geometry",
+                "matrix", "probability", "statistics", "mathematics",
+                "python", "programming", "computer",
+                "algorithm", "database", "software",
+                "coding", "data", "machine", "learning"
+            ]
+        )
+
+        # Fit once
+        self.vectorizer.fit([
+            "dna biology genetics",
+            "gravity force physics",
+            "acid atom chemistry",
+            "calculus algebra mathematics",
+            "python programming computer science"
+        ])
+
     def get_embedding(self, text):
         try:
-            vectorizer = TfidfVectorizer()
-            vector = vectorizer.fit_transform([text]).toarray()[0]
+            vector = self.vectorizer.transform([text]).toarray()[0]
             return vector.tolist()
+
         except Exception as e:
             print(f"Embedding Error: {e}")
             return [0.0]
@@ -87,12 +110,6 @@ class MLModels:
             v1 = np.array(vec1, dtype=float)
             v2 = np.array(vec2, dtype=float)
 
-            # Make vectors same size
-            max_len = max(len(v1), len(v2))
-
-            v1 = np.pad(v1, (0, max_len - len(v1)))
-            v2 = np.pad(v2, (0, max_len - len(v2)))
-
             if np.linalg.norm(v1) == 0 or np.linalg.norm(v2) == 0:
                 return 0.0
 
@@ -100,7 +117,7 @@ class MLModels:
                 np.linalg.norm(v1) * np.linalg.norm(v2)
             )
 
-            return float(similarity)
+            return round(float(similarity), 4)
 
         except Exception as e:
             print(f"Cosine Similarity Error: {e}")
